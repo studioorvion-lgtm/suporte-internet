@@ -1,0 +1,21 @@
+{
+  "name": "suporte-internet",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Landing page de alta conversão para suporte a problemas de conexão de internet",
+  "scripts": {
+    "dev": "npx serve .",
+    "start": "npx serve .",
+    "build": "node -e \"console.log('Build complete - Static site ready')\"",
+    "test": "node test.js"
+  },
+  "keywords": [
+    "internet",
+    "suporte",
+    "conexao",
+    "whatsapp",
+    "google-ads"
+  ],
+  "author": "",
+  "license": "MIT"
+}
