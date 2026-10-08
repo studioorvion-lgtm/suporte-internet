@@ -1,5 +1,5 @@
 /**
- * SUPORTE DE INTERNET — GESTÃO DE CONVERSÃO & WHATSAPP
+ * AJUDA COM SUA CONEXÃO — GESTÃO DE CONVERSÃO & WHATSAPP
  * Otimizado para tráfego do Google Ads
  */
 
@@ -50,20 +50,20 @@
   const activePhone = currentTracking.tel || DEFAULT_PHONE;
 
   /**
-   * Constrói a mensagem padrão do WhatsApp conforme requisito:
-   * “Olá! Estou com problema na minha internet e preciso de atendimento.
+   * Constrói a mensagem padrão do WhatsApp conforme especificação exata:
+   * “Olá! Estou com problema na minha internet.
    *
    * Problema: [problema]
    * Cidade/Bairro:
    * Internet atual:”
    */
   function buildWhatsAppMessage(problemSelected) {
-    let msg = 'Olá! Estou com problema na minha internet e preciso de atendimento.\n\n';
+    let msg = 'Olá! Estou com problema na minha internet.\n\n';
     msg += 'Problema: ' + (problemSelected ? problemSelected : '') + '\n';
     msg += 'Cidade/Bairro:\n';
     msg += 'Internet atual:';
 
-    // Se houver termo de pesquisa ou campanha vindo do Google Ads, registra discretamente
+    // Se houver termo de pesquisa ou campanha vindo do Google Ads, preserva
     if (currentTracking.utm_term) {
       msg += '\n\nRef: ' + currentTracking.utm_term;
     }
@@ -72,9 +72,17 @@
   }
 
   /**
-   * Dispara evento de conversão do Google Ads e dataLayer
+   * Dispara evento de conversão do Google Ads e dataLayer sem duplicidade
    */
+  let lastConversionTime = 0;
   function trackConversion(label, problem) {
+    const now = Date.now();
+    // Previne disparos repetidos acidentais no mesmo clique
+    if (now - lastConversionTime < 500) {
+      return;
+    }
+    lastConversionTime = now;
+
     try {
       window.dataLayer = window.dataLayer || [];
       window.dataLayer.push({
@@ -104,7 +112,7 @@
   /**
    * Gera o link do WhatsApp com mensagem codificada
    */
-  function getWhatsAppUrl(problem, buttonId) {
+  function getWhatsAppUrl(problem) {
     const text = buildWhatsAppMessage(problem);
     const encoded = encodeURIComponent(text);
     return 'https://wa.me/' + activePhone + '?text=' + encoded;
@@ -116,9 +124,9 @@
   function openWhatsApp(problem, buttonLabel) {
     trackConversion(buttonLabel || 'whatsapp_button', problem);
 
-    const url = getWhatsAppUrl(problem, buttonLabel);
+    const url = getWhatsAppUrl(problem);
 
-    // Pequeno delay de 120ms para garantir envio da tag do Google Ads
+    // Delay de 120ms para garantir envio da tag do Google Ads
     setTimeout(function () {
       window.open(url, '_blank', 'noopener,noreferrer');
     }, 120);
@@ -126,12 +134,12 @@
 
   // Inicialização no DOM
   document.addEventListener('DOMContentLoaded', function () {
-    // 1. Atualiza todos os links com classe .btn-whatsapp
+    // 1. Atualiza todos os botões e links com data-wa-trigger
     const buttons = document.querySelectorAll('[data-wa-trigger]');
     buttons.forEach(function (btn) {
       const problem = btn.getAttribute('data-problem') || '';
       const label = btn.getAttribute('data-label') || 'cta_click';
-      const url = getWhatsAppUrl(problem, label);
+      const url = getWhatsAppUrl(problem);
       
       btn.setAttribute('href', url);
       btn.setAttribute('target', '_blank');
@@ -142,35 +150,24 @@
       });
     });
 
-    // 2. Cards de problemas da Seção 2
+    // 2. Cards de problemas da Seção 2 (toque no card abre WhatsApp com o problema específico)
     const problemCards = document.querySelectorAll('.problem-card');
     problemCards.forEach(function (card) {
       card.addEventListener('click', function (e) {
-        // Se já não clicou direto na tag <a>
-        if (e.target.tagName.toLowerCase() !== 'a') {
+        if (e.target.tagName.toLowerCase() !== 'a' && !e.target.closest('a')) {
           const problem = card.getAttribute('data-problem') || '';
           openWhatsApp(problem, 'card_' + (problem.toLowerCase().replace(/\s+/g, '_')));
         }
       });
     });
 
-    // 3. Indicador dinâmico de horário e atendimento online
-    const liveTimeEl = document.getElementById('live-time');
-    if (liveTimeEl) {
-      const now = new Date();
-      const hours = String(now.getHours()).padStart(2, '0');
-      const minutes = String(now.getMinutes()).padStart(2, '0');
-      liveTimeEl.textContent = hours + ':' + minutes;
-    }
-
-    // 4. Controle de visibilidade da barra fixa mobile
+    // 3. Controle de visibilidade da barra fixa mobile
     const stickyBar = document.getElementById('mobile-sticky-bar');
     const heroSection = document.querySelector('.hero-section');
 
     if (stickyBar && heroSection) {
       function checkStickyVisibility() {
         const heroBottom = heroSection.getBoundingClientRect().bottom;
-        // Mostra a barra fixa no mobile após scrollar levemente ou logo abaixo da primeira dobra
         if (window.innerWidth <= 768) {
           if (heroBottom < 100) {
             stickyBar.classList.add('is-active');
@@ -188,6 +185,6 @@
     }
   });
 
-  // Exporta para escopo global se necessário
+  // Exporta função global
   window.openWhatsApp = openWhatsApp;
 })();

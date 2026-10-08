@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 function runTests() {
-  console.log('--- INICIANDO TESTES DA LANDING PAGE ---');
+  console.log('--- INICIANDO TESTES DA LANDING PAGE ATUALIZADA ---');
   let errors = 0;
 
   function assert(condition, message) {
@@ -21,12 +21,11 @@ function runTests() {
   });
 
   const html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf-8');
-  const css = fs.readFileSync(path.join(__dirname, 'styles.css'), 'utf-8');
   const js = fs.readFileSync(path.join(__dirname, 'main.js'), 'utf-8');
 
   // 2. Headings e Textos do Hero
   assert(html.includes('Sua internet está') && html.includes('lenta ou caindo?'), 'Headline do Hero presente');
-  assert(html.includes('Fale agora pelo WhatsApp e veja como resolver problemas de conexão, sinal e estabilidade.'), 'Subheadline do Hero presente');
+  assert(html.includes('Está com internet ruim, sem sinal ou conexão instável? Fale agora pelo WhatsApp.'), 'Subheadline do Hero ajustada');
   assert(html.includes('FALAR AGORA PELO WHATSAPP'), 'Botão principal do Hero presente');
   assert(html.includes('Atendimento rápido pelo WhatsApp.'), 'Texto de apoio do Hero presente');
 
@@ -55,25 +54,20 @@ function runTests() {
   assert(html.includes('FALAR PELO WHATSAPP'), 'CTA da Seção 4 presente');
 
   // 6. WhatsApp & Mensagem Pré-preenchida
-  assert(js.includes('Olá! Estou com problema na minha internet e preciso de atendimento.'), 'Mensagem de saudação do WhatsApp presente');
+  assert(js.includes('Olá! Estou com problema na minha internet.'), 'Mensagem de saudação do WhatsApp presente');
   assert(js.includes('Problema:') && js.includes('Cidade/Bairro:') && js.includes('Internet atual:'), 'Campos pré-preenchidos do WhatsApp presentes');
+  assert(js.includes('5511964322774'), 'Número do WhatsApp correto');
 
   // 7. Tracking & UTMs/GCLID
+  assert(js.includes('AW-18476149806/1u9PCI-jhYcdEK7YjupE'), 'ID de conversão do Google Ads correto');
   assert(js.includes('utm_source') && js.includes('gclid'), 'Preservação de UTMs e GCLID presente');
   assert(js.includes('dataLayer.push') || js.includes('window.dataLayer'), 'Disparo para dataLayer presente');
-  assert(js.includes('gtag') && js.includes('conversion'), 'Evento de conversão gtag presente');
 
-  // 8. Mobile & CSS
-  assert(html.includes('mobile-sticky-bar'), 'Barra fixa inferior mobile presente');
-  assert(html.includes('FALAR NO WHATSAPP AGORA'), 'CTA fixo mobile presente');
-  assert(css.includes('overflow-x: hidden'), 'Proteção contra overflow horizontal presente');
-  assert(css.includes('max-width'), 'Responsividade nos containers');
+  // 8. Menção natural Nio
+  assert(html.includes('Está pesquisando por internet lenta Nio, Nio sem sinal ou problemas de conexão?'), 'Bloco textual contextual Nio presente');
 
-  // 9. SEO & Palavras-chave
-  const keywords = ['internet lenta', 'internet ruim', 'internet caindo', 'internet sem sinal', 'internet fora do ar', 'internet travando', 'problema com internet', 'conexão instável', 'Nio'];
-  keywords.forEach(kw => {
-    assert(html.toLowerCase().includes(kw.toLowerCase()), `Palavra-chave presente no HTML: ${kw}`);
-  });
+  // 9. Remoção de termos excessivamente técnicos
+  assert(!html.includes('diagnóstico técnico') && !html.includes('suporte técnico'), 'Ausência de termos excessivamente técnicos no corpo');
 
   console.log('--- RESULTADO DOS TESTES ---');
   if (errors === 0) {

@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://suporte-internet.vercel.app/sitemap.xml
+Sitemap: https://conexao-direta.vercel.app/sitemap.xml
