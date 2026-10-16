@@ -7,7 +7,7 @@
   'use strict';
 
   // Configuração padrão do WhatsApp
-  const DEFAULT_PHONE = '5511964322774';
+  const DEFAULT_PHONE = '5551983072161';
   const GOOGLE_ADS_CONVERSION_ID = 'AW-18476149806/1u9PCI-jhYcdEK7YjupE';
 
   // Recupera parâmetros de URL (UTMs e GCLID) e persiste no sessionStorage

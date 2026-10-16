@@ -56,7 +56,7 @@ function runTests() {
   // 6. WhatsApp & Mensagem Pré-preenchida
   assert(js.includes('Olá! Estou com problema na minha internet.'), 'Mensagem de saudação do WhatsApp presente');
   assert(js.includes('Problema:') && js.includes('Cidade/Bairro:') && js.includes('Internet atual:'), 'Campos pré-preenchidos do WhatsApp presentes');
-  assert(js.includes('5511964322774'), 'Número do WhatsApp correto');
+  assert(js.includes('5551983072161'), 'Número do WhatsApp correto');
 
   // 7. Tracking & UTMs/GCLID
   assert(js.includes('AW-18476149806/1u9PCI-jhYcdEK7YjupE'), 'ID de conversão do Google Ads correto');
