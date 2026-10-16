@@ -6,9 +6,15 @@
 (function () {
   'use strict';
 
-  // Configuração padrão do WhatsApp
+  // Configuração definitiva do WhatsApp
   const DEFAULT_PHONE = '5551983072161';
   const GOOGLE_ADS_CONVERSION_ID = 'AW-18476149806/1u9PCI-jhYcdEK7YjupE';
+
+  // Limpa qualquer resquício de número antigo armazenado em cache local
+  try {
+    sessionStorage.removeItem('trk_tel');
+    localStorage.removeItem('trk_tel');
+  } catch (e) {}
 
   // Recupera parâmetros de URL (UTMs e GCLID) e persiste no sessionStorage
   const UTM_KEYS = [
@@ -17,8 +23,7 @@
     'utm_campaign',
     'utm_term',
     'utm_content',
-    'gclid',
-    'tel'
+    'gclid'
   ];
 
   function getTrackingParams() {
@@ -47,10 +52,10 @@
   }
 
   const currentTracking = getTrackingParams();
-  const activePhone = currentTracking.tel || DEFAULT_PHONE;
+  const activePhone = DEFAULT_PHONE;
 
   /**
-   * Constrói a mensagem padrão do WhatsApp conforme especificação exata:
+   * Constrói a mensagem padrão do WhatsApp conforme especificação:
    * “Olá! Estou com problema na minha internet.
    *
    * Problema: [problema]
@@ -63,7 +68,6 @@
     msg += 'Cidade/Bairro:\n';
     msg += 'Internet atual:';
 
-    // Se houver termo de pesquisa ou campanha vindo do Google Ads, preserva
     if (currentTracking.utm_term) {
       msg += '\n\nRef: ' + currentTracking.utm_term;
     }
@@ -77,7 +81,6 @@
   let lastConversionTime = 0;
   function trackConversion(label, problem) {
     const now = Date.now();
-    // Previne disparos repetidos acidentais no mesmo clique
     if (now - lastConversionTime < 500) {
       return;
     }
@@ -110,7 +113,7 @@
   }
 
   /**
-   * Gera o link do WhatsApp com mensagem codificada
+   * Gera o link do WhatsApp com mensagem codificada para o número 5551983072161
    */
   function getWhatsAppUrl(problem) {
     const text = buildWhatsAppMessage(problem);
@@ -126,7 +129,6 @@
 
     const url = getWhatsAppUrl(problem);
 
-    // Delay de 120ms para garantir envio da tag do Google Ads
     setTimeout(function () {
       window.open(url, '_blank', 'noopener,noreferrer');
     }, 120);
@@ -145,12 +147,12 @@
       btn.setAttribute('target', '_blank');
       btn.setAttribute('rel', 'noopener noreferrer');
 
-      btn.addEventListener('click', function (e) {
+      btn.addEventListener('click', function () {
         trackConversion(label, problem);
       });
     });
 
-    // 2. Cards de problemas da Seção 2 (toque no card abre WhatsApp com o problema específico)
+    // 2. Cards de problemas da Seção 2
     const problemCards = document.querySelectorAll('.problem-card');
     problemCards.forEach(function (card) {
       card.addEventListener('click', function (e) {
@@ -185,6 +187,5 @@
     }
   });
 
-  // Exporta função global
   window.openWhatsApp = openWhatsApp;
 })();
